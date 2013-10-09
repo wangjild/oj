@@ -1,109 +1,122 @@
 #include <algorithm>
 #include <iostream>
 #include <set>
+#include <cstring>
 
 using namespace std;
 
-int coin[10001] = {0};
+int mark[1001] = {0};
+int tmp[1001] = {0};
 
-set<int> ls;
-set<int> rs;
+int left_arr[1001] = {0};
+int right_arr[1001] = {0};
 
-set<int> tls;
-set<int> trs;
-
-inline void findTrue(set<int> &main, set<int>& slave) {
-    if (main.size() == 0 || slave.size() == 0)
-        return ;
-
-    set<int> diff;
-    set<int>::iterator it = set_difference(main.begin(), main.end(), slave.begin(), slave.end(), diff.begin());
-    diff.resize(it - diff.begin());
-
-    for(it = diff.begin(); it < diff.end(); ++it) 
-    {
-        coin[*it] = 1;
+inline void debug(const set<int>& falseCoin) {
+#if WANGJING_DEBUG
+    cout << "false coin: ";
+    for(set<int>::iterator it = falseCoin.begin(); it != falseCoin.end(); ++it) {
+        cout << *it << " ";
     }
-}
-
-inline void remainFalse(set<int>& main, set<int>& slave) 
-{
-    set<int> same;
-    set<int>::iterator it = set_union(main.begin(), main.end(), slave.begin(), slave.end(), same.begin());
-
-    same.resize(it - same.begin());
-
-    main.swap(same);
-}
-
-void unionCoin(set<int>& small, set<int>& big) 
-{
-    findTrue(ls, small);
-    findTrue(rs, big);
-
-    remainFalse(ls, small);
-    remainFalse(rs, small);
-}
-
-void inline removeTrueCoin(set<int>& main, set<int>& left) 
-{
-    set<int>::iterator it;
-
-    for (it = slave.begin(); it < slave.end(); ++it) 
-    {
-        if (coin[*it] == 1) 
-            continue;
-        main.erase(*it);
-        coin[*it] = 1;
-    }
-}
-
-void clearTrueCoin(set<int> &l, set<int>& r) {
-    removeTrueCoin(ls, l);
-    removeTrueCoin(rs, l);
-    removeTrueCoin(ls, r);
-    removeTrueCoin(rs, r);
-}
-
-inline void debug() {
-#if DEBUG
-    set<int>::iterator it;
-    cout << "left: "
-    for (it = ls.begin(); it < ls.end(); ++it) {
-        cout << *it << ' ';
-    }
-    count << endl;
-
-    cout << "right: "
-    for (it = rs.begin(); it < rs.end(); ++it) {
-        cout << *it << ' ';
-    }
-    count << endl;
-
+    cout << endl;
 #else 
 #endif
 }
+
+void debug(int* arr, int size, int l) {
+#ifdef WANGJING_DEBUG
+    if (l) 
+        cout << "left: ";
+    else
+        cout << "right: ";
+    for(int i = 0; i < size; ++i) {
+        cout<< arr[i] << " ";
+    }
+    cout << endl;
+#else
+#endif
+}
+
+void intersectionCoin(set<int>& falseCoin, int* coin, int maxcoin, bool l) {
+
+    int middle = maxcoin / 2;
+    for(int i = 0; i < middle; ++i) {
+        if (l) {
+            ++left_arr[coin[i]];
+            if (right_arr[coin[i]] != 0) {
+                falseCoin.erase(coin[i]);
+            }
+        } else {
+            ++right_arr[coin[i]];
+            if (left_arr[coin[i]] != 0) {
+                falseCoin.erase(coin[i]);
+            }
+        }
+    }
+    for(int i = middle; i < maxcoin; ++i) {
+        if (l) {
+            ++right_arr[coin[i]];
+            if (left_arr[coin[i]] != 0) {
+                falseCoin.erase(coin[i]);
+            }
+        } else {
+            ++left_arr[coin[i]];
+            if (right_arr[coin[i]] != 0) {
+                falseCoin.erase(coin[i]);
+            }
+        }
+    }
+    debug(falseCoin);
+
+
+    set<int> tmp(coin, coin + maxcoin);
+
+    set<int> same;
+    set_intersection(falseCoin.begin(), falseCoin.end(), tmp.begin(), tmp.end(), insert_iterator<set<int> >(same, same.end()));
+
+    falseCoin.swap(same);
+}
+
+void clearTrueCoin(set<int>& falseCoin, int* arr, int maxcoin) {
+
+    set<int> tmp(arr, arr + maxcoin);
+    set<int> same;
+#ifdef WANGJING_DEBUG 
+    cout<<"Before ClearTrue: ";
+    debug(falseCoin);
+#endif
+    set_difference(falseCoin.begin(), falseCoin.end(), tmp.begin(), tmp.end(), insert_iterator<set<int> >(same, same.end()));
+
+    falseCoin.swap(same);
+#ifdef WANGJING_DEBUG
+    cout<<"After ClearTrue: ";
+    debug(falseCoin);
+#endif
+}
+
 int main() {
+
+    memset(left_arr, 0, sizeof(int) * 1001);
+    memset(right_arr, 0, sizeof(int) * 1001);
+
     int N, K;
     cin >> N >> K;
 
-    int maxline = 2*K;
     int i;
+    for(i = 0; i < N; ++i) {
+        mark[i] = i + 1;
+    }
+
+    set<int> falseCoin(mark, mark + N);
+
+    int maxline = 2*K;
     for (i = 0; i < maxline; i += 2) {
         int n, j;
         cin >> n;
-
         int maxcoin = 2*n;
-        for (j = 0; j < n; ++j) {
+        for (j = 0; j < maxcoin; ++j) {
             int idx;
             cin >> idx;
-            tls.insert(idx);
-        }
-
-        for (; j < maxcoin; ++j) {
-            int idx;
-            cin >> idx;
-            trs.insert(idx);
+            tmp[j] = idx;
         }
 
         char c;
@@ -111,14 +124,22 @@ int main() {
 
         switch (c) {
             case '<' :
-                unionCoin(tls, trs);    
+                intersectionCoin(falseCoin, tmp, maxcoin, true);
                 break;
             case '>' :
-                unionCoin(trs, tls);    
+                intersectionCoin(falseCoin, tmp, maxcoin, false);    
                 break;
             case '=' :
-                clearTrueCoin(tls, trs);
+                clearTrueCoin(falseCoin, tmp, maxcoin);
                 break;
         }
+
+        debug(falseCoin);
+    }
+
+    if (falseCoin.size() == 1) {
+        cout << *(falseCoin.begin()) << endl;
+    } else {
+        cout <<0<< endl;
     }
 }
