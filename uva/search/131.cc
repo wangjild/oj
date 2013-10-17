@@ -15,7 +15,6 @@ char word[9][32] = {
 // hand[14][0-3] 记录的是黑红梅方的数量
 // hand[1-13][4] 记录的是每张牌不分花色的数量
 char hand[14][5];
-
 char deck[14][5];
 
 char map[256];
@@ -96,6 +95,37 @@ int judgeBest() {
     return 8;
 }
 
-int main() {
+int solve(char *str) {
+    int ans = 10;
+
+    for (int i = 0; i < (1<<5); ++i) {
+        int num = 0; 
+        for (int j = 0; j < 5; ++j) {
+            if (i & (1 << j)) {
+                
+            }
+        }
+    }
     
+}
+
+int main() {
+    init();
+
+    char str[64];
+    while (gets(str) != NULL) {
+        str[29] = ' '; str[30] = '\0';
+        printf("Hand: ");
+        for (int i = 2; i < 15; i += 3) {
+            hand[map[i-2]][map[i-1]] += 1;
+            printf("%c%c%c", str[i-2], str[i-1], str[i]);
+        }
+        printf("Deck: ");
+        for (int i = 17; i < 30; ++i) {
+            printf("%c%c%c", str[i-2], str[i-1], str[i]);
+        }
+
+        int ans = solve(str);
+        printf("Best hand: %s\n", word[ans]);
+    }
 }
