@@ -1,102 +1,68 @@
 #include <cstdio>
-#include <vector>
 #include <algorithm>
+#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
 struct sec_t {
     int s;
-    int d;
+    int e;
     int p;
-    /*
-    bool operator() (const sec_t& a, const sec_t& b) {
-        if (a.s < b.s)
-            return true;
-        else if (a.s == b.s) {
-            return a.d > b.d;
-        }
-        return false;
-    }*/
 };
 
-bool func(const sec_t& a, const sec_t& b) {
-    if (a.s < b.s)
-        return true;
-    else if (a.s == b.s) {
-         return a.d > b.d;
-    }
-
-    return false;
-}
-
-vector<sec_t> v;
-
 #define MAXN 23
-int sqr[MAXN][MAXN];
+sec_t v[MAXN];
+int sqr[MAXN];
 
 int N; // capacity of bus
 int M; // total station
 int O; // number of order
 
 int maxval = 0, mins, mind, maxs, maxd;
-void print();
 
-void dfs(vector<sec_t>::iterator it, int income) {
-
-    if (it == v.end()) {
-        maxval = max(income, maxval);
-        return ;
+bool ok(int s, int e) {
+    for(int i = s; i < e; ++i) {
+        if (v[i].p + sqr[i] > N)
+            return false;
     }
-    // has "have" sit remaining
-    print();
-    int remain = sqr[(*it).s][(*it).d];
-    int have = remain > (*it).p ? remain - (*it).p : remain;
-
-    printf("income%d start:%d dist:%d remain:%d have:%d\n", income, (*it).s, (*it).d, remain, have);
-    for (int i = have; i >= 0; ++i) {
-        income += i * (*it).d;
-        for(int start = (*it).d; start < (*it).s + (*it).d; ++start)
-            for(int j = start; j < (*it).s + (*it).d; ++j)
-                sqr[i][j] -= have;
-        dfs(++it, income);
-        for(int start = (*it).d; start < (*it).s + (*it).d; ++start)
-            for(int j = start; j < (*it).s + (*it).d; ++j)
-                sqr[(*it).s][j] += have;
-        income -= i * (*it).d;
-    }
+    return true;
 }
 
-void print() {
-    for(int i = mins; i <= maxs; ++i) {
-        for(int j = mind; j <= maxd; ++j) {
-            printf("%d ", sqr[i][j]);
+void dfs(int it, int income) {
+
+    maxval = max(maxval, income);
+   
+    while (it < O) {
+        if (!ok(v[it].s, v[it].e)) {
+            it ++;
+            continue;
+        } 
+        income += v[it].p * (v[it].e - v[it].s);
+        for (int i = v[it].s; i < v[it].e; ++i) {
+            sqr[i] += v[it].p;
         }
-        printf("\n");
+        dfs(it + 1, income);
+        for (int i = v[it].s; i < v[it].e; ++i) {
+            sqr[i] -= v[it].p;
+        }
+        income -= v[it].p * (v[it].e - v[it].s);
+        it ++;
     }
 }
 
 int main() {
     while (scanf("%d%d%d", &N, &M, &O), N || M || O) {
 
-        for (int i = 0; i < N; ++i)
-            for (int j = 0; j < N; ++j)
-                sqr[i][j] = N;
-
+        memset(sqr, 0, sizeof(int) * MAXN);
         maxval = 0;
-        v.clear();
         for(int i = 0; i < O; ++i) {
             int s, e, o;
-            scanf("%d%d%d", &s, &e, &o);
-            sec_t tmp; tmp.s = s; tmp.d = e - s; tmp.p = o;
-            mins = min(s, mins);
-            mind = min(mind, tmp.d);
-            maxs = max(s, maxs);
-            maxd = max(maxd, tmp.d);
-            v.push_back(tmp);
+            scanf("%d%d%d", &v[i].s, &v[i].e, &v[i].p);
         }
 
-        sort(v.begin(), v.end(), func);
-        dfs(v.begin(), 0);
+        sort(v, v + O, func);
+        dfs(0, 0);
         printf("%d\n", maxval);
     } 
 }
