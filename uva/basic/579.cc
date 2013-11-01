@@ -1,21 +1,22 @@
-#include <stdio.h>
+#include<iostream>
+#include<cstdio>
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
-int main(void)
+using namespace std;
+
+int main()
 {
-    char s[10]="";
     int h, m;
-    double angle;
-    while(fgets(s, 10, stdin)!=NULL)
+    double sum;
+    while(scanf("%d:%d", &h, &m) && (h||m))
     {
-        sscanf(s,"%d:%d", &h, &m);
-        if(h==0 && m==0) break;
-        angle = fabs (6*m-((double) m / 2 + h * 30));
-        if(360 - angle < angle)
-            angle = 360 - angle;
-        printf("%.3lf\n", (floor( angle * 1000 + 0.5)) / 1000);
+        if (h == 12)
+            h=0;
+        sum=(h*30.0+m*1.0/2)-m*6.0;
+        if (sum < 0)
+            sum=-sum;
+        if (sum > 180)
+            sum=360-sum;
+        printf("%.3f\n", sum);
     }
     return 0;
 }
