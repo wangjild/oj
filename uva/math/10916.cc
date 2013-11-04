@@ -1,22 +1,16 @@
-#include <cstdio>
+#include<cstdio>
+#include<cmath>
 
-int s = 1960;
+int solve(int k) {
+  double M = pow(2, k), sum = 0;
+  for(int i = 1; ; i++) {
+    sum += log(i);
+    if(sum > M * log(2)) return i-1;
+  }
+}
 
 int main() {
-    
-    int year;
-
-    while (scanf("%d", &year), year) {
-        int num = 1 << ((year - s) / 10 + 2);
-        int mul = 1, ans = 0;
-        for (int i = 1; i < 1024; ++i) {
-            mul *= i;
-            if (mul > num) {
-                ans = i - 1;
-                break;
-            }
-        }
-
-        printf("%d\n", ans);
-    }
+  int y;
+  while(scanf("%d", &y) == 1 && y) printf("%d\n", solve(y/10 - 194));
+  return 0;
 }
