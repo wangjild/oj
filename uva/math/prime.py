@@ -5,7 +5,7 @@ for i in range(1, maxnum):
 
 for i in range(2, maxnum):
 	for j in range (2, maxnum / i + 1):
-		if i*j < maxnum:
+		if i*j < maxnum and shoplist[i*j] == 0:
 			shoplist[i*j] = 1
 
 prime = []
