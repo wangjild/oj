@@ -7,39 +7,37 @@ using namespace std;
 const int N = 51;
 
 struct mystring {
-	char str[N];
-	int len;
+	char str[2*N];
+//	int len;
 };
 
 mystring str[N];
 
-void find_cmp_point(const mystring& a, char** ap, 
-		const mystring& b, char** bp) {
-	int alen = strlen(*ap), blen = strlen(*bp);
-	if (alen > blen) {
-		while (strncmp(*ap, *bp, blen) == 0) {
-			*ap += blen;
-		}
-	} else {
-		while (strncmp(*ap, *bp, blen) == 0) {
-			*bp += len;
-		}
-	}
-
-	find_cmp_point(a, ap, b, bp);
+#define SwapPoint(s, l, sl, ll, flag) { \
+	if ((sl) > (ll)) { \
+		swap((s), (l)); swap((sl), (ll)); (flag) = !(flag); \
+	} \
 }
 
 bool compare(const mystring& a, const mystring& b) {
-	char* ap = a.str, bp = b.str;
-	find_cmp_point(a, &ap, b, &bp);
-
-	int len = min (strlen(ap), strlen(bp));
-
-	for (int i = 0; i < len; ++i) {
-		if ( *(ap+i) != *(bp + i))
-			return *(ap+i) > *(bp + i);
+	bool flag = true;
+	const char* s = a.str, *l = b.str;
+	int sl = strlen(s), ll = strlen(l);
+	SwapPoint(s, l, sl, ll, flag);
+	while (sl > 0 && memcmp(l, s, sl) == 0) {
+//		printf("long :%s len:%d\nshort:%s len:%d\n", l, ll, s, sl);
+		l += sl;
+		ll -= sl;
+		SwapPoint(s, l, sl, ll, flag);
 	}
-	return true;
+
+	for (int i = 0; i < sl; ++i) {
+		if (*(s + i) != *(l + i)) {
+			return flag ? *(s + i) > *(l + i) : !(*(s + i) > *(l + i));
+		}
+	}
+
+	return flag ? true : false;
 }
 
 int main () {
@@ -49,7 +47,7 @@ int main () {
 			//int num; scanf("%d", &num);
 			//sprintf(str[i].str, "%d", num);
 			scanf("%s", str[i].str);
-			str[i].len = strlen(str[i].str);
+//			str[i].len = strlen(str[i].str);
 		}
 
 		sort(str, str + n, compare);
