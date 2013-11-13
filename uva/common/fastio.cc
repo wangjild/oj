@@ -12,7 +12,9 @@ int analyse(char* buf, int len = MAXS) {
 	for (char *p = buf; *p && p - buf < len; ++p) {
 		if (*p == ' ' || *p == '\n')
 			num[++i] = 0;
-		else 
+		else if(*p == '-') 
+            num[i] = 0 - num[i];
+        else
 			num[i] = num[i] * 10 + *p - '0';
 	}
 	return i;
