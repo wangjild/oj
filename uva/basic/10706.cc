@@ -75,14 +75,14 @@ int main() {
 
 		// 123...idx
 		long long idx = bsearch(num, 1, lenmax - 1, numlen);
-//		printf("idx:%lld startidx:%lld\n", idx, num - numlen[idx - 1]);
-//		printf("lenof[112123--123idx]:%lld, lenof[1234--idx]:%lld\n", numlen[idx], justlen[idx]);
+		printf("idx:%lld startidx:%lld\n", idx, num - numlen[idx - 1]);
+		printf("lenof[112123--123idx]:%lld, lenof[1234--idx]:%lld\n", numlen[idx], justlen[idx]);
 		long long numberlen = num - numlen[idx - 1];
 
 		// number 是 123...idx 所指向的数字
 		long long number = bsearch(numberlen, 1, lenmax - 1, justlen);
 		long long last = numberlen - justlen[number - 1];
-//		printf("number:%lld last:%lld\n", number, last);
+		printf("number:%lld last:%lld\n", number, last);
 
 		char buf[16];
 		sprintf(buf, "%lld", number);
