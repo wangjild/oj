@@ -59,6 +59,7 @@ int main () {
     while (c--) {
         int l, r, M;
         scanf("%d", &M);
+        n = 0;
         while (scanf("%d%d", &l, &r), l || r) {
             section[n].l = l; section[n].r = r;
             n++;
@@ -88,13 +89,11 @@ int main () {
                     cl = section[i].l, cr = section[i].r;
                 }
             } else { // section[i].l > leftmark
-                if (cr < rightmark) 
-                {
-                    break;
-                }
 
                 ans[an].l = cl, ans[an].r = cr; an ++;
-                leftmark = cl, rightmark = cr;
+                leftmark = cr;
+                if (cr > M)
+                    break;
             }
         }
 
