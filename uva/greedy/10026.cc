@@ -49,6 +49,11 @@ int cmp(const Task& a, const Task& b) {
 }
 
 int main() {
+#ifdef TEST
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+#endif
+    
     int c;
     scanf("%d", &c);
     while(c--) {

@@ -1,4 +1,4 @@
- /*
+/*
  *   Author:        wangjild <wangjild@gmail.com>
  *   Blog:          http://www.liloke.com/
  *   Github:        https://github.com/wangjild/oj
@@ -41,16 +41,22 @@ typedef struct sec{
     int l, r;
 } sec_t;
 
-sec_t section[2500000];
-sec_t ans[2500000];
+sec_t section[10000];
+sec_t ans[10000];
 
 int n, an;
 
 bool cmp(const sec_t& a, const sec_t& b) {
-    if (a.l == b.l)
-        return a.r < b.r;
     return a.l < b.l;
 } 
+
+void dump() {
+    printf("******DUMP*******\n");
+    for (int i = 0; i < n; ++i) {
+        printf("%d: (%d,%d)\n", i, section[i].l, section[i].r);
+    }
+    printf("******DOWN*******\n");
+}
 
 int main () {
     int c;
@@ -61,43 +67,42 @@ int main () {
         scanf("%d", &M);
         n = 0;
         while (scanf("%d%d", &l, &r), l || r) {
+            if ((l < 0 && r <= 0) || (l >= M && r >= M))
+                continue;
             section[n].l = l; section[n].r = r;
             n++;
         }
         sort(section, section + n, cmp);
-
-        if (section[0].l > 0) {
+        //dump();
+        if (n == 0 || section[0].l > 0) {
             printf("0\n");
+            if (c) printf("\n");
             continue;
         }
 
-        if (section[0].l <= 0 && section[0].r >= M) {
-            printf("1\n%d %d\n", section[0].l, section[0].r);
-            continue;
-        }
         an = 0;
-
-        int leftmark = 0;
-        int rightmark = 0;
-
-        int cl = INT_MIN, cr = INT_MIN;
-        rep(i, n) {
-            if (section[i].l <= leftmark && section[i].r < leftmark)
-                continue;
-            else if (section[i].l <= leftmark && section[i].r >= leftmark) {
-                if (cr < section[i].r) {
-                    cl = section[i].l, cr = section[i].r;
+        int i = 0, left = 0, right = 0;
+        
+        while(i < n) {
+            bool flag = false;
+            while (i < n && section[i].l <= left) {
+                if (section[i].r > right) {
+                    ans[an].l = section[i].l;
+                    right = ans[an].r = section[i].r;
+                    flag = true;
                 }
-            } else { // section[i].l > leftmark
-
-                ans[an].l = cl, ans[an].r = cr; an ++;
-                leftmark = cr;
-                if (cr > M)
-                    break;
+                ++i;
             }
-        }
 
-        if (an == 0 || ans[an - 1].r < M) {
+            if (!flag) break;
+            an ++;
+
+            if (right >= M) break;
+            left = right;
+            --i;
+        }
+        
+        if (right < M) {
             printf("0\n");
         } else {
             printf("%d\n", an);
@@ -105,10 +110,9 @@ int main () {
                 printf("%d %d\n", ans[i].l, ans[i].r);
             }
         }
-
-
         if (c)
             printf("\n");
     }
+
 }
 
