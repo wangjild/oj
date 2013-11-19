@@ -35,14 +35,17 @@ using namespace std;
 
 typedef long long LL;
 typedef unsigned long long ULL;
+void intline2buf(int* , int);
+void str2buf(const char*, int);
+void printall();
 
 /****** TEMPLATE ENDS ******/
 typedef struct sec{
     int l, r;
 } sec_t;
 
-sec_t section[10000];
-sec_t ans[10000];
+sec_t section[100000];
+sec_t ans[100000];
 
 int n, an;
 
@@ -73,12 +76,6 @@ int main () {
             n++;
         }
         sort(section, section + n, cmp);
-        //dump();
-        if (n == 0 || section[0].l > 0) {
-            printf("0\n");
-            if (c) printf("\n");
-            continue;
-        }
 
         an = 0;
         int i = 0, left = 0, right = 0;
@@ -103,16 +100,85 @@ int main () {
         }
         
         if (right < M) {
-            printf("0\n");
+            str2buf("0\n", 2);
         } else {
-            printf("%d\n", an);
+            int number[2];
+            number[0] = an;
+            intline2buf(number, 1);
             for (int i = 0; i < an; ++i) {
-                printf("%d %d\n", ans[i].l, ans[i].r);
+                number[0] = ans[i].l;
+                number[1] = ans[i].r;
+                intline2buf(number, 2);
             }
         }
         if (c)
-            printf("\n");
+            str2buf("\n", 1);
     }
-
+    printall();
+    return 0;
 }
 
+#include <cstdio>
+
+#define likely(x) __builtin_expect(!!(x), 1)
+
+#define unlikely(x) __builtin_expect(!!(x), 0)
+
+const int MAXN = 50001;
+int num[MAXN];
+
+const int MAXS = 20 * MAXN + 1;
+char buf[MAXS];
+
+int analyse(char* buf, int len = MAXS) {
+    int i;
+    num[i = 0] = 0;
+    bool flag = false;
+	for (char *p = buf; *p && p - buf < len; ++p) {
+		if (*p == ' ' || *p == '\n') {
+            if (flag) {
+                num[i] = 0 - num[i];
+                flag = false;
+            }
+			num[++i] = 0;
+        }
+		else if(unlikely(*p == '-')) {
+            flag = true;
+        }
+        else
+			num[i] = num[i] * 10 + *p - '0';
+	}
+	return i;
+}
+
+int fastreadint() {
+    int len = fread(buf, 1, MAXS, stdin);
+    buf[len] = '\0';
+
+	return analyse(buf, len);
+}
+
+int bufidx = 0;
+void double2buf(double val, int size) {
+    bufidx += sprintf(buf + bufidx, "%.4f\n", val);
+    buf[bufidx] = '\0';
+}
+
+void intline2buf(int *val, int intnum) {
+    for (int i = 0; i < intnum; ++i) {
+        if (likely(i)) bufidx += sprintf(buf + bufidx, " %d", val[i]);
+        else bufidx += sprintf(buf+bufidx, "%d", val[i]);
+    }
+    bufidx += sprintf(buf+bufidx, "\n");
+    buf[bufidx] = '\0';
+}
+
+void str2buf(const char* str, int len) {
+    memcpy(buf + bufidx, str, len);
+    bufidx += len;
+    buf[bufidx] = '\0';
+}
+
+void printall() {
+    printf("%s", buf);
+}
